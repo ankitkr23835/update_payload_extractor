@@ -26,6 +26,7 @@ def extract(payload_file_name, output_dir="output", old_dir="old", partition_nam
             raise
 
     with open(payload_file_name, 'rb') as payload_file:
+       try:
         payload = update_payload.Payload(payload_file)
         payload.Init()
 
@@ -46,7 +47,8 @@ def extract(payload_file_name, output_dir="output", old_dir="old", partition_nam
                     part.operations, part.partition_name,
                     'install_operations', output_file,
                     part.new_partition_info)
-
+       except Exception as e:
+         prin(e)
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("payload", metavar="payload.bin",
