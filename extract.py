@@ -9,7 +9,8 @@ from update_payload import applier
 
 
 def list_content(payload_file_name):
-    with open(payload_file_name, 'rb') as payload_file:
+    try:
+      with open(payload_file_name, 'rb') as payload_file:
         payload = update_payload.Payload(payload_file)
         payload.Init()
 
@@ -17,6 +18,8 @@ def list_content(payload_file_name):
             print("{} ({} bytes)".format(part.partition_name,
                                          part.new_partition_info.size))
 
+    except Exception as e:
+         print(e)
 
 def extract(payload_file_name, output_dir="output", old_dir="old", partition_names=None):
     try:
@@ -24,14 +27,14 @@ def extract(payload_file_name, output_dir="output", old_dir="old", partition_nam
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
-
-    with open(payload_file_name, 'rb') as payload_file:
-       try:
+    try:
+      with open(payload_file_name, 'rb') as payload_file:
         payload = update_payload.Payload(payload_file)
         payload.Init()
 
         helper = applier.PayloadApplier(payload)
         for part in payload.manifest.partitions:
+          try:
             if partition_names and part.partition_name not in partition_names:
                 continue
             print("Extracting {}".format(part.partition_name))
@@ -47,8 +50,10 @@ def extract(payload_file_name, output_dir="output", old_dir="old", partition_nam
                     part.operations, part.partition_name,
                     'install_operations', output_file,
                     part.new_partition_info)
-       except Exception as e:
-         prin(e)
+          except Exception as e:
+             print(e)
+    except Exception as e:
+         print(e)
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("payload", metavar="payload.bin",
